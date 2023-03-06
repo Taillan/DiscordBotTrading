@@ -1,4 +1,5 @@
 require('dotenv').config(); //initialize dotenv
+const { messageLink } = require('discord.js');
 const Discord = require('discord.js');
 var fs = require("fs");
 const { type } = require('os');
@@ -102,7 +103,7 @@ client.on('messageCreate', msg => {
               "isLeverage": 1,
               "side": trade_type,
               "orderType": "Market", //TODO Ecris en dure a modifié
-              "qty": "a calculer avec un get du price, du portemonnai et faire 5%",
+              "qty": "a calculer avec le entryprice et les 5% du wallet (selon strat)",
               "price": entry_price,
               "takeProfit": "A gérer car on peux en mettre quun mais ne pas mettre la position a 100%",
               "stopLoss": stop_loss.toString(),
@@ -114,10 +115,7 @@ client.on('messageCreate', msg => {
               "tpSlMode": "Full", //Full,Partial
               "slSize": stop_loss.toString(),
             }
-
-            for(const tp in tp_list){
-              
-            }
+            msg.reply("```JSON\n" +JSON.stringify(POSITION)+"```");
         }
 
         
