@@ -1,5 +1,8 @@
 require('dotenv').config(); //initialize dotenv
 const Discord = require('discord.js');
+var fs = require("fs");
+const { type } = require('os');
+const testnet = "https://api-testnet.bybit.com";
 
 const client = new Discord.Client({
     intents: [
@@ -9,8 +12,11 @@ const client = new Discord.Client({
         Discord.GatewayIntentBits.DirectMessages,
         Discord.GatewayIntentBits.Guilds,
     ] 
-}); //create new client
-//make sure this line is the last line
+}); 
+
+//GET la clef API depuis un fichier privé
+const api_key = fs.readFileSync("../.api_key").toString('utf-8');
+
 client.login(process.env.TOKEN); //login bot using token
 
 client.on('ready', () => {
@@ -27,16 +33,17 @@ client.on("disconnected", function () {
 });
 
 client.on('messageCreate', msg => {
-// You can view the msg object here with console.log(msg)
     entry_price = 0;
     leverage = 1;
-    type = "";
+    trade_type = "";
     stop_loss = 0;
     tp_list = [];
     token="";
 
     Parsed = msg.content.split('\n')
     if (Parsed[0] === '-------------------------') {
+      console.log("api_key");
+      console.log(api_key);
             for(const el in Parsed){
               if(Parsed[el].includes("Token")){
                 let temp =Parsed[el].split(' ');
@@ -44,7 +51,13 @@ client.on('messageCreate', msg => {
               }
               if(Parsed[el].includes("Type")){
                 let temp =Parsed[el].split(' ');
-                type = temp[temp.length -1];
+                trade_type = temp[temp.length -1];
+                if(trade_type == "Long"){
+                  trade_type = "Buy";
+                }
+                else{
+                  trade_type = "Sell"
+                }
               }
               if(Parsed[el].includes("Entry price")){
                 let temp =Parsed[el].split(' ');
@@ -86,21 +99,25 @@ client.on('messageCreate', msg => {
             {
               "category": "linear",
               "symbol": token.replace("/",""),
+              "isLeverage": 1,
+              "side": trade_type,
+              "orderType": "Market", //TODO Ecris en dure a modifié
+              "qty": "a calculer avec un get du price, du portemonnai et faire 5%",
+              "price": entry_price,
+              "takeProfit": "A gérer car on peux en mettre quun mais ne pas mettre la position a 100%",
+              "stopLoss": stop_loss.toString(),
+              "slTriggerBy": "A voir avec un trader la stratégie",
+              // La suite a vérifier cest pas partout dans la doc a essayer sur le testnet quoi
               "tradeMode":1, //0: cross margin. 1: isolated margin
               "buyLeverage": leverage,
               "buyLeverage": leverage,
-              "tpSlMode": "Partial", //Full,Partial
-              "stopLoss": stop_loss.toString(),
+              "tpSlMode": "Full", //Full,Partial
               "slSize": stop_loss.toString(),
             }
 
-            
-            msg.reply(`entry_price ${entry_price}`);
-            msg.reply(`leverage ${leverage}`);
-            msg.reply(`type ${type}`);
-            msg.reply(`stop_loss ${stop_loss}`);
-            msg.reply(`tp_list ${tp_list}`);
-            msg.reply(`token ${token}`);
+            for(const tp in tp_list){
+              
+            }
         }
 
         
