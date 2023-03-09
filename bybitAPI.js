@@ -18,20 +18,22 @@ const {
   const useTestnet = false;
   
   const client = new RestClientV5({
-    key: API_KEY,
-    secret: API_SECRET,
-    testnet: useTestnet
-  },
-    // requestLibraryOptions
-  );
+      key: API_KEY,
+      secret: API_SECRET,
+      testnet: useTestnet,
+      enable_time_sync: 1,
+      },
+    );
   
-  // For public-only API calls, simply don't provide a key & secret or set them to undefined
-  // const client = new RestClientV5({});
-  // 'CONTRACT' | 'SPOT' | 'INVESTMENT' | 'OPTION' | 'UNIFIED' | 'FUND'
-  client.getWalletBalance({accountType:'CONTRACT',coin:'USDT'})
+  const getAllCountBallanceContract = () => {
+    client.getAllCoinsBalance({
+      accountType: 'CONTRACT'})
     .then(result => {
-      console.log("getWalletBalance result: ", result.result.coin);
+      return result.result;
     })
     .catch(err => {
-      console.error("getWalletBalance error: ", err);
+      return err;
     });
+  }
+
+module.export = {getAllCountBallanceContract};

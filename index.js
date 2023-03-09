@@ -1,4 +1,5 @@
 require('dotenv').config(); //initialize dotenv
+const { getAllCountBallanceContract } = require('./bybitAPI');
 const {
   messageLink
 } = require('discord.js');
@@ -12,9 +13,6 @@ const {
 endpoint = require('./endpoint.js');
 
 //GET la clef API depuis un fichier privé
-const api_key = fs.readFileSync("../.api_key").toString('utf-8');
-const privateKey = fs.readFileSync("../.private_key", "utf8");
-const publicKey = fs.readFileSync("../.pub_key", "utf8");
 var crypto = require("crypto");
 
 var axios_instance = axios.create({
@@ -43,49 +41,7 @@ client.on('ready', () => {
 
 client.on("messageCreate", msg => {
   if (msg.content.includes("Balance")) {
-    const rec_windows =5000;
-    const accountType = "UNIFIED";
-    const coin = "BTC";
-    const target = endpoint.TEST_NET + `/v5/account/wallet-balance`
-    const timestamp = Date.now();
-    const message = timestamp + api_key + rec_windows.toString() + target;
-    
-    sign.write(message);
-    const signature = sign.sign(privateKey,'hex','RSA_SHA256');
-    sign.end();
-    const config = {
-      headers: {
-        "content-type": "application/json",
-        'X-BAPI-API-KEY': api_key.toString(),
-        'X-BAPI-TIMESTAMP': Date.now(),
-        'X-BAPI-SIGN': signature.toString(),
-        'X-BAPI-RECV-WINDOW': rec_windows.toString()
-      }
-    };
-    
-    axios_instance.get('/v5/account/wallet-balance',{
-      params: {
-        'accountType':'UNIFIED',
-        'coin':'BTC'
-      }
-      })
-      .then(function(response){
-        console.log(response);
-      }).catch(function (error) {
-        if (error.response) {
-          // Request made and server responded
-          console.log(error.response.data);
-          console.log(error.response.status);
-          console.log(error.response.headers);
-        } else if (error.request) {
-          // The request was made but no response was received
-          console.log(error.request);
-        } else {
-          // Something happened in setting up the request that triggered an Error
-          console.log('Error', error.message);
-        }
-      })
-
+    msg.reply("```JSON\n" + JSON.stringify(getAllCountBallanceContract()) + "```");
   }
 }
 )
@@ -100,8 +56,6 @@ client.on('messageCreate', msg => {
 
   Parsed = msg.content.split('\n')
   if (Parsed[0] === '-------------------------') {
-    console.log("api_key");
-    console.log(api_key);
     for (const el in Parsed) {
       if (Parsed[el].includes("Token")) {
         let temp = Parsed[el].split(' ');
