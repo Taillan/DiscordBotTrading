@@ -24,17 +24,17 @@ const client = new RestClientV5({
   enable_time_sync: 1,
 });
 
-const getAllCountBallanceContract = () => {
-  client
+function getAllCountBallanceContract() {
+  return client
     .getAllCoinsBalance({
       accountType: "CONTRACT",
     })
     .then((result) => {
-      return result.result;
+      return JSON.stringify(result.result);
     })
     .catch((err) => {
       return err;
     });
-};
+}
 
-module.export = { getAllCountBallanceContract };
+module.exports = { getAllCountBallanceContract };

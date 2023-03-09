@@ -5,6 +5,7 @@ const { messageLink } = require("discord.js");
 const Discord = require("discord.js");
 const axios = require("axios");
 var fs = require("fs");
+const { BADFLAGS } = require("dns");
 
 endpoint = require("./endpoint.js");
 
@@ -24,11 +25,10 @@ client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
-client.on("messageCreate", (msg) => {
+client.on("messageCreate", async (msg) => {
   if (msg.content.includes("Balance")) {
-    msg.reply(
-      "```JSON\n" + JSON.stringify(getAllCountBallanceContract()) + "```"
-    );
+    const Balance = await getAllCountBallanceContract();
+    msg.reply("```JSON\n" + Balance + "```");
   }
 });
 
