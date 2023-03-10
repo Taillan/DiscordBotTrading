@@ -1,6 +1,6 @@
 require("dotenv").config(); //initialize dotenv
-const { getAllCountBallanceContract } = require("./bybitAPI.js");
-const { pongCommand } = require("./commands/command");
+const { getAllCountBallanceContract } = require("./interface/bybitAPI.js");
+const { pongCommand } = require("./commands/Ping");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
@@ -32,7 +32,9 @@ for (const file of commandFiles) {
   const filePath = path.join(commandsPath, file);
   const command = require(filePath);
   if ("data" in command && "execute" in command) {
-    commands.push(command.data.toJSON());
+    let temp = command.data.toJSON();
+    temp.execute = command.execute;
+    commands.push(temp);
   } else {
     console.log(
       `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
@@ -72,7 +74,7 @@ client.on("disconnected", function () {
   console.log("FIN INSCRIPTION DES COMMANDES SUR DISCORD");
 })();
 
-client.on("ready", () => {
+client.on(Events.ClientReady, () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
@@ -80,8 +82,9 @@ client.on("ready", () => {
 client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
-  const command = interaction.client.commands.get(interaction.commandName);
-
+  //const command = interaction.client.commands.get(interaction.commandName);
+  const command = commands.find((o) => o.name === interaction.commandName);
+  console.log(command);
   if (!command) {
     console.error(`No command matching ${interaction.commandName} was found.`);
     return;
@@ -90,18 +93,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
   try {
     await command.execute(interaction);
   } catch (error) {
+    console.error(`Error executing ${interaction.commandName}`);
     console.error(error);
-    if (interaction.replied || interaction.deferred) {
-      await interaction.followUp({
-        content: "There was an error while executing this command!",
-        ephemeral: true,
-      });
-    } else {
-      await interaction.reply({
-        content: "There was an error while executing this command!",
-        ephemeral: true,
-      });
-    }
   }
 });
 
