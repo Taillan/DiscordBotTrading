@@ -1,11 +1,11 @@
 require("dotenv").config(); //initialize dotenv
 const { getAllCountBallanceContract } = require("./bybitAPI.js");
-const { pongCommand } = require("./command/command")
+const { pongCommand } = require("./command/command");
 const Discord = require("discord.js");
-const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord-api-types/v9');
-const rest = new REST({ version: '9' }).setToken('tokendiscord'); 
-const { SlashCommandBuilder } = require('discord.js');
+const { REST } = require("@discordjs/rest");
+const { Routes } = require("discord-api-types/v9");
+const rest = new REST({ version: "9" }).setToken("tokendiscord");
+const { SlashCommandBuilder } = require("discord.js");
 
 const client = new Discord.Client({
   intents: [
@@ -17,43 +17,48 @@ const client = new Discord.Client({
   ],
 });
 
-
-  // LISTE DES COMMANDES
+// LISTE DES COMMANDES
 const pingCommand = new SlashCommandBuilder()
-    .setName('ping')
-    .setDescription('Renvoie "pong"');
+  .setName("ping")
+  .setDescription('Renvoie "pong"');
 
-    const commands = [pingCommand];
-
+const commands = [pingCommand];
 
 client.login(process.env.TOKEN); //login bot using token
 
 client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
-
-  // INSCRIPTION DES COMMANDES SUR DISCORD
-  (async () => {
-    try {
-      await rest.put(
-        Routes.applicationCommands(process.env.APP_ID),
-        { body: commands.map(command => command.toJSON()) },
-      );
-    } catch (error) {
-      console.error(error);
-    }
-  })(); 
 });
 
+// This code will run once the bot has disconnected from Discord.
+client.on("disconnected", function () {
+  // alert the console
+  console.log("Disconnected!");
+
+  // exit node.js with an error
+  process.exit(1);
+});
+
+// INSCRIPTION DES COMMANDES SUR DISCORD
+(async () => {
+  try {
+    await rest.put(Routes.applicationCommands(process.env.APP_ID), {
+      body: commands.map((command) => command.toJSON()),
+    });
+  } catch (error) {
+    console.error(error);
+  }
+})();
+
 // INTERACTIONS AUX COMMANDES
-client.on('interactionCreate', async interaction => {
+client.on("interactionCreate", async (interaction) => {
   if (!interaction.isCommand()) return;
 
-  if (interaction.commandName === 'ping') {
+  if (interaction.commandName === "ping") {
     const response = await ping();
     await interaction.reply(response);
   }
-
-})
+});
 
 //Get balance msg
 client.on("messageCreate", async (msg) => {
