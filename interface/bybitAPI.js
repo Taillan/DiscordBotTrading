@@ -37,4 +37,121 @@ function getAllCountBallanceContract() {
     });
 }
 
-module.exports = { getAllCountBallanceContract };
+function getCountBallanceContract(
+  AccoutnType,
+  Coin,
+  withBonus = undefined,
+  memberId = undefined
+) {
+  return client
+    .getCoinBalance({
+      accountType: AccoutnType,
+      coin: Coin,
+      withBonus: withBonus,
+      memberId: memberId,
+    })
+    .then((result) => {
+      return JSON.stringify(result.result);
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+}
+
+function getOrders(
+  AccountCategory,
+  symbol = undefined,
+  baseCoin = undefined,
+  settleCoin = undefined,
+  orderLinkId = undefined,
+  openOnly = undefined,
+  orderFilter = undefined,
+  limit = undefined,
+  cursor = undefined
+) {
+  return client
+    .getActiveOrders({
+      category: AccountCategory,
+      symbol: symbol,
+      baseCoin: baseCoin,
+      settleCoin: settleCoin,
+      orderId: orderId,
+      orderLinkId: orderLinkId,
+      openOnly: openOnly,
+      orderFilter: orderFilter,
+      limit: limit,
+      cursor: cursor,
+    })
+    .then((result) => {
+      return JSON.stringify(result.result);
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+}
+
+function getPosition(
+  AccountCategory,
+  symbol = undefined,
+  baseCoin = undefined,
+  settleCoin = undefined,
+  limit = undefined,
+  cursor = undefined
+) {
+  return client
+    .getPositionInfo({
+      category: AccountCategory,
+      symbol: symbol,
+      baseCoin: baseCoin,
+      settleCoin: settleCoin,
+      limit: limit,
+      cursor: cursor,
+    })
+    .then((result) => {
+      return JSON.stringify(result.result);
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+}
+
+function getExecution(
+  AccountCategory,
+  symbol = undefined,
+  baseCoin = undefined,
+  orderId = undefined,
+  orderLinkId = undefined,
+  startTime = undefined,
+  endTime = undefined,
+  execType = undefined,
+  limit = undefined,
+  cursor = undefined
+) {
+  return client
+    .getExecutionList({
+      category: AccountCategory,
+      symbol: symbol,
+      orderId: orderId,
+      orderLinkId: orderLinkId,
+      baseCoin: baseCoin,
+      startTime: startTime,
+      endTime: endTime,
+      execType: execType,
+      limit: limit,
+      cursor: cursor,
+    })
+    .then((result) => {
+      return JSON.stringify(result.result);
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+}
+
+module.exports = {
+  getAllCountBallanceContract,
+  getCountBallanceContract,
+  getOrders,
+  getPosition,
+  getExecution,
+};

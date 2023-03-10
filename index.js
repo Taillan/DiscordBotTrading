@@ -84,7 +84,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
   //const command = interaction.client.commands.get(interaction.commandName);
   const command = commands.find((o) => o.name === interaction.commandName);
-  console.log(command);
+
   if (!command) {
     console.error(`No command matching ${interaction.commandName} was found.`);
     return;
@@ -95,14 +95,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
   } catch (error) {
     console.error(`Error executing ${interaction.commandName}`);
     console.error(error);
-  }
-});
-
-//Get balance msg
-client.on("messageCreate", async (msg) => {
-  if (msg.content.includes("GetBalance")) {
-    const Balance = await getAllCountBallanceContract();
-    msg.reply("```JSON\n" + Balance + "```");
   }
 });
 
