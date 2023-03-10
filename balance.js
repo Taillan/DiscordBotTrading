@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js");
-const { getAllCountBallanceContract } = require("./bybitAPI.js");
+const { getAllCountBallanceContract } = require("bybitAPI");
 
 module.exports = {
   data: new SlashCommandBuilder()

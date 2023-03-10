@@ -1,34 +1,48 @@
 require("dotenv").config(); //initialize dotenv
 const { getAllCountBallanceContract } = require("./bybitAPI.js");
-const { pongCommand } = require("./command/command");
-const Discord = require("discord.js");
+const { pongCommand } = require("./commands/command");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
-const rest = new REST({ version: "9" }).setToken("tokendiscord");
-const { SlashCommandBuilder } = require("discord.js");
+const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
+const { Client, Collection, Events, GatewayIntentBits } = require("discord.js");
+const path = require("node:path");
+const fs = require("node:fs");
 
-const client = new Discord.Client({
+const client = new Client({
   intents: [
-    Discord.GatewayIntentBits.Guilds,
-    Discord.GatewayIntentBits.GuildMessages,
-    Discord.GatewayIntentBits.MessageContent,
-    Discord.GatewayIntentBits.DirectMessages,
-    Discord.GatewayIntentBits.Guilds,
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.DirectMessages,
+    GatewayIntentBits.Guilds,
   ],
 });
 
-// LISTE DES COMMANDES
-const pingCommand = new SlashCommandBuilder()
-  .setName("ping")
-  .setDescription('Renvoie "pong"');
+const commands = [];
+console.log("Collection commands créé");
 
-const commands = [pingCommand];
+const commandsPath = path.join(__dirname, "commands");
+const commandFiles = fs
+  .readdirSync(commandsPath)
+  .filter((file) => file.endsWith(".js"));
+console.log("Collection files readed");
 
+// Grab the SlashCommandBuilder#toJSON() output of each command's data for deployment
+for (const file of commandFiles) {
+  const filePath = path.join(commandsPath, file);
+  const command = require(filePath);
+  if ("data" in command && "execute" in command) {
+    commands.push(command.data.toJSON());
+  } else {
+    console.log(
+      `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
+    );
+  }
+}
+console.log("Command added to collection");
+
+console.log("Connexion du Bot");
 client.login(process.env.TOKEN); //login bot using token
-
-client.on("ready", () => {
-  console.log(`Logged in as ${client.user.tag}!`);
-});
 
 // This code will run once the bot has disconnected from Discord.
 client.on("disconnected", function () {
@@ -41,22 +55,53 @@ client.on("disconnected", function () {
 
 // INSCRIPTION DES COMMANDES SUR DISCORD
 (async () => {
+  console.log("INSCRIPTION DES COMMANDES SUR DISCORD");
   try {
+    console.log(
+      `Started refreshing ${commands.length} application (/) commands.`
+    );
     await rest.put(Routes.applicationCommands(process.env.APP_ID), {
-      body: commands.map((command) => command.toJSON()),
+      body: commands,
     });
+    console.log(
+      `Successfully reloaded ${commands.length} application (/) commands.`
+    );
   } catch (error) {
     console.error(error);
   }
+  console.log("FIN INSCRIPTION DES COMMANDES SUR DISCORD");
 })();
 
-// INTERACTIONS AUX COMMANDES
-client.on("interactionCreate", async (interaction) => {
-  if (!interaction.isCommand()) return;
+client.on("ready", () => {
+  console.log(`Logged in as ${client.user.tag}!`);
+});
 
-  if (interaction.commandName === "ping") {
-    const response = await ping();
-    await interaction.reply(response);
+// INTERACTIONS AUX COMMANDES
+client.on(Events.InteractionCreate, async (interaction) => {
+  if (!interaction.isChatInputCommand()) return;
+
+  const command = interaction.client.commands.get(interaction.commandName);
+
+  if (!command) {
+    console.error(`No command matching ${interaction.commandName} was found.`);
+    return;
+  }
+
+  try {
+    await command.execute(interaction);
+  } catch (error) {
+    console.error(error);
+    if (interaction.replied || interaction.deferred) {
+      await interaction.followUp({
+        content: "There was an error while executing this command!",
+        ephemeral: true,
+      });
+    } else {
+      await interaction.reply({
+        content: "There was an error while executing this command!",
+        ephemeral: true,
+      });
+    }
   }
 });
 
