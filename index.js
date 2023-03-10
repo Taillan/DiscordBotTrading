@@ -1,13 +1,7 @@
 require("dotenv").config(); //initialize dotenv
 const { getAllCountBallanceContract } = require("./bybitAPI.js");
 
-const { messageLink } = require("discord.js");
 const Discord = require("discord.js");
-const axios = require("axios");
-var fs = require("fs");
-const { BADFLAGS } = require("dns");
-
-endpoint = require("./endpoint.js");
 
 const client = new Discord.Client({
   intents: [
