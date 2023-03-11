@@ -3,8 +3,8 @@ const { getCountBallanceContract } = require("../interface/bybitAPI.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("balance")
-    .setDescription("Replies with youre token blance!")
+    .setName("all_balance")
+    .setDescription("Replies with youre balance!")
     .addStringOption((option) =>
       option
         .setName("type")
@@ -21,14 +21,10 @@ module.exports = {
           { name: "FUND", value: "FUND" }
         )
         .setRequired(true)
-    )
-    .addStringOption((option) =>
-      option.setName("coin").setDescription("The coin").setRequired(true)
     ),
   async execute(interaction) {
     let Balance = await getCountBallanceContract(
-      interaction.options.getString("type"),
-      interaction.options.getString("coin")
+      interaction.options.getString("type")
     );
     console.log(Balance);
     await interaction.reply(

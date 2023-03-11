@@ -1,0 +1,34 @@
+const { SlashCommandBuilder } = require("discord.js");
+const { ByBitInterface } = require("../interface/bybitAPI.js");
+
+module.exports = {
+  data: new SlashCommandBuilder()
+    .setName("CommandName")
+    .setDescription("CommandDescription")
+    .addStringOption((option) =>
+      option
+        .setName("Option1")
+        .setDescription("OptionDescritpiotb")
+        .addChoices(
+          {
+            name: "Choice1",
+            value: "Value1",
+          },
+          { name: "Choice2", value: "Value2" },
+          { name: "Choice3", value: "Value3" },
+          { name: "Choice4", value: "Value4" }
+        )
+        .setRequired(true)
+    )
+    .addStringOption((option) =>
+      option
+        .setName("OptionName2")
+        .setDescription("Optiondescription")
+        .setRequired(true)
+    ),
+  async execute(interaction) {
+    let data = await ByBitInterface(interaction.options.getString("Option1X"));
+    console.log(JSON.parse(data));
+    await interaction.reply("```JSON\n" + data + "```");
+  },
+};

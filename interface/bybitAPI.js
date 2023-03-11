@@ -12,17 +12,30 @@ const {
 } = require("bybit-api");
 
 var fs = require("fs");
-
+const useTestnet = true;
 const API_KEY = fs.readFileSync("../.api_key").toString("utf-8");
 const API_SECRET = fs.readFileSync("../.api_secret", "utf8");
-const useTestnet = false;
+const TESTNET_API_KEY = process.env.API_KEY_BYBIT_TESTNET; //fs.readFileSync("../.api_key").toString("utf-8");
+const TESTNET_API_SECRET = process.env.SECRET_KEY_TESTNET; //fs.readFileSync("../.api_secret", "utf8");
 
-const client = new RestClientV5({
-  key: API_KEY,
-  secret: API_SECRET,
-  testnet: useTestnet,
-  enable_time_sync: 1,
-});
+let client = undefined;
+if (!useTestnet) {
+  console.log("Setup RealNet");
+  client = new RestClientV5({
+    key: API_KEY,
+    secret: API_SECRET,
+    testnet: useTestnet,
+    enable_time_sync: 1,
+  });
+} else {
+  console.log("Setup TestNet");
+  client = new RestClientV5({
+    key: TESTNET_API_KEY,
+    secret: TESTNET_API_SECRET,
+    testnet: useTestnet,
+    enable_time_sync: 1,
+  });
+}
 
 function getAllCountBallanceContract() {
   return client
