@@ -12,13 +12,19 @@ const {
 } = require("bybit-api");
 
 var fs = require("fs");
-const useTestnet = true;
+let useTestnet = true;
 const API_KEY = fs.readFileSync("../.api_key").toString("utf-8");
 const API_SECRET = fs.readFileSync("../.api_secret", "utf8");
-const TESTNET_API_KEY = process.env.API_KEY_BYBIT_TESTNET; //fs.readFileSync("../.api_key").toString("utf-8");
-const TESTNET_API_SECRET = process.env.SECRET_KEY_TESTNET; //fs.readFileSync("../.api_secret", "utf8");
+let TESTNET_API_KEY = "aoFwkVyYVGoTUJn8rT"; //fs.readFileSync("../.api_key").toString("utf-8");
+let TESTNET_API_SECRET = "XBBijwTUAWAkEFmCczaRNUWy9rerHS66tl7h"; //fs.readFileSync("../.api_secret", "utf8");
 
-let client = undefined;
+let client = new RestClientV5({
+  key: API_KEY,
+  secret: API_SECRET,
+  testnet: useTestnet,
+  enable_time_sync: 1,
+});
+
 if (!useTestnet) {
   console.log("Setup RealNet");
   client = new RestClientV5({
@@ -28,7 +34,7 @@ if (!useTestnet) {
     enable_time_sync: 1,
   });
 } else {
-  console.log("Setup TestNet");
+  console.log("Setup TestNet "+TESTNET_API_KEY+" : "+TESTNET_API_SECRET);
   client = new RestClientV5({
     key: TESTNET_API_KEY,
     secret: TESTNET_API_SECRET,

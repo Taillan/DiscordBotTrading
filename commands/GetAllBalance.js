@@ -27,7 +27,7 @@ module.exports = {
       interaction.options.getString("type")
     );
     console.log(Balance);
-    await interaction.reply(
+    return interaction.reply(
       "```JSON\n" + JSON.parse(Balance).balance.walletBalance + "```"
     );
   },

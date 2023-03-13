@@ -31,7 +31,7 @@ module.exports = {
       interaction.options.getString("coin")
     );
     console.log(Balance);
-    await interaction.reply(
+    return interaction.reply(
       "```JSON\n" + JSON.parse(Balance).balance.walletBalance + "```"
     );
   },
